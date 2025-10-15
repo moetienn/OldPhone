@@ -37,6 +37,7 @@ namespace OldPhoneKeyPad
                     result += GetLetterFromDictionnary(lastChar, count);
                     lastChar = '\0';
                     count = 0;
+                    continue;
                 }
                 if (c == lastChar)
                     count++;
