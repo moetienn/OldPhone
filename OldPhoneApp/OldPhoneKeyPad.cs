@@ -41,7 +41,7 @@ namespace OldPhoneKeyPad
     /// - '#': end; flushes any pending sequence and stops.
     /// Any unknown characters are ignored.
     /// </remarks>
-	class Keypad
+	public static class Keypad
 	{
         /// <summary>
         /// Decodes the specified keypad input string into text.
