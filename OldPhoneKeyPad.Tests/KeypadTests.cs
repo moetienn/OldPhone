@@ -1,5 +1,6 @@
 using Xunit;
 using System;
+using System.Linq;
 
 namespace OldPhoneKeyPad.Tests
 {
@@ -80,6 +81,18 @@ namespace OldPhoneKeyPad.Tests
         {
             var unit = "4433555 555666096667775553"; // HELLO WORLD
             var repeat = 100;
+            var input = string.Concat(Enumerable.Repeat(unit, repeat)) + "#";
+            var expected = string.Concat(Enumerable.Repeat("HELLO WORLD", repeat));
+
+            var output = KeypadDecoder.OldPhonePad(input);
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Very_Long_Chain_Repeats_HelloWorld_million_Times()
+        {
+            var unit = "4433555 555666096667775553"; // HELLO WORLD
+            var repeat = 1000000;
             var input = string.Concat(Enumerable.Repeat(unit, repeat)) + "#";
             var expected = string.Concat(Enumerable.Repeat("HELLO WORLD", repeat));
 
