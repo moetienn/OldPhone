@@ -1,7 +1,4 @@
-using System;
-using System.Data.Common;
-using System.Dynamic;
-using System.Runtime.Serialization;
+using System.Text;
 
 namespace OldPhoneKeyPad
 {
@@ -51,9 +48,13 @@ namespace OldPhoneKeyPad
         /// </summary>
         /// <param name="input">The raw keypad input consisting of digits and control characters.</param>
         /// <returns>The decoded text.</returns>
+        /// /// <remarks>
+        /// Assumes that every input sequence ends with a '#' character, as specified in the requirements.
+        /// The '#' character signals the end of input and stops processing.
+        /// </remarks>
 		public static String OldPhonePad(string input)
 		{
-			string result = "";
+			var sb = new StringBuilder();
 			char lastChar = '\0';
 			int count = 0;
 			for (int i = 0; i < input.Length; i++)
@@ -73,8 +74,8 @@ namespace OldPhoneKeyPad
                         lastChar = '\0';
                         count = 0;
                     }
-                    else if (result.Length > 0)
-                        result = result.Substring(0, result.Length - 1);
+                    else if (sb.Length > 0)
+                        sb.Remove(sb.Length - 1, 1);
                     continue;
                 }
                 // ' ' space acts as a separator: confirms the current letter without adding a visible space.
@@ -82,7 +83,7 @@ namespace OldPhoneKeyPad
                 {
                     if (count > 0)
                     {
-                        result += GetLetterFromDictionary(lastChar, count);
+                        sb.Append(GetLetterFromDictionary(lastChar, count));
                         lastChar = '\0';
                         count = 0;    
                     }
@@ -95,17 +96,16 @@ namespace OldPhoneKeyPad
                 else
                 {
                     if (lastChar != '\0')
-                        result += GetLetterFromDictionary(lastChar, count);
+                        sb.Append(GetLetterFromDictionary(lastChar, count));
                     lastChar = c;
                     count = 1;
                 }
         	}
             // Final flush to ensure the last sequence of key presses is processed before returning the final decoded text.
             if (count > 0)
-                result += GetLetterFromDictionary(lastChar, count);
-			return result;
+                sb.Append(GetLetterFromDictionary(lastChar, count));
+			return sb.ToString();
 		}
-
         /// <summary>
         /// Returns the decoded character for a given key and press count.
         /// </summary>
