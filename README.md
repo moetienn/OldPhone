@@ -82,6 +82,6 @@ Tests cover the main behaviours: decoding examples, separators, backspace rules,
 - `7` -> "PQRS7"
 - `8` -> "TUV8"
 - `9` -> "WXYZ9"
-- `0` -> " " (space)
+- `0` -> " 0" (space and zero)
 
 Pressing a key cycles through the characters for that key; pressing more times than the number of characters wraps around.
