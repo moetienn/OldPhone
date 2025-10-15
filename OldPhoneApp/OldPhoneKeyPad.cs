@@ -1,8 +1,3 @@
-using System;
-using System.Data.Common;
-using System.Dynamic;
-using System.Runtime.Serialization;
-
 namespace OldPhoneKeyPad
 {
     /// <summary>
@@ -51,6 +46,10 @@ namespace OldPhoneKeyPad
         /// </summary>
         /// <param name="input">The raw keypad input consisting of digits and control characters.</param>
         /// <returns>The decoded text.</returns>
+        /// /// <remarks>
+        /// Assumes that every input sequence ends with a '#' character, as specified in the requirements.
+        /// The '#' character signals the end of input and stops processing.
+        /// </remarks>
 		public static String OldPhonePad(string input)
 		{
 			string result = "";
@@ -105,7 +104,6 @@ namespace OldPhoneKeyPad
                 result += GetLetterFromDictionary(lastChar, count);
 			return result;
 		}
-
         /// <summary>
         /// Returns the decoded character for a given key and press count.
         /// </summary>
