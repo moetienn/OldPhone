@@ -57,15 +57,6 @@ dotnet run --project OldPhoneApp "44 4440 33#"
 # Output: HI E
 ```
 
-If you prefer to build a self-contained publish (optional):
-
-```bash
-# publish to folder (adjust -r and -c as needed)
-dotnet publish -c Release -r win-x64 --self-contained false -o ./publish
-# then run the produced executable:
-./publish/OldPhoneApp "<input>"
-```
-
 Exit codes:
 - 0 — success (or graceful exit when stdout is closed).
 - 1 — incorrect usage or unexpected error.
@@ -94,7 +85,3 @@ Tests cover the main behaviours: decoding examples, separators, backspace rules,
 - `0` -> " " (space)
 
 Pressing a key cycles through the characters for that key; pressing more times than the number of characters wraps around.
-
-## License
-
-No license file included in the repo.
