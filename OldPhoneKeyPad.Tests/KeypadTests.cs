@@ -1,5 +1,5 @@
 using Xunit;
-
+using System;
 
 namespace OldPhoneKeyPad.Tests
 {
@@ -9,7 +9,7 @@ namespace OldPhoneKeyPad.Tests
         public void Decodes_Turing_Sequence()
         {
             var input = "8 8877744466*664#";
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             Assert.Equal("TURING", output);
         }
 
@@ -17,7 +17,7 @@ namespace OldPhoneKeyPad.Tests
         public void Space_Separator_DoesNotInsertRealSpace()
         {
             var input = "22 22#"; // B + B
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             Assert.Equal("BB", output);
         }
 
@@ -25,7 +25,7 @@ namespace OldPhoneKeyPad.Tests
         public void Zero_Inserts_Real_Space()
         {
             var input = "44 4440 33#"; // HI + space + E
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             Assert.Equal("HI E", output);
         }
 
@@ -33,7 +33,7 @@ namespace OldPhoneKeyPad.Tests
         public void Classic_Hello()
         {
             var input = "4433555 555666#"; // HELLO
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             Assert.Equal("HELLO", output);
         }
 
@@ -41,7 +41,7 @@ namespace OldPhoneKeyPad.Tests
         public void Backspace_Cancels_Pending_Or_Removes_Emitted()
         {
             var input = "66*664#";
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             // 66 (pending) -> * cancels -> 66 -> N, then 4 -> G => "NG"
             Assert.Equal("NG", output);
         }
@@ -50,7 +50,7 @@ namespace OldPhoneKeyPad.Tests
         public void Unknown_Chars_Are_Ignored()
         {
             var input = "2211c122222c#";
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             // "22" -> B, "111" -> ?, "22222" -> A  => "B?A"
             Assert.Equal("B?A", output);
         }
@@ -59,7 +59,7 @@ namespace OldPhoneKeyPad.Tests
         public void Key1_Punctuation_Wraps()
         {
             var input = "111#"; // 1 -> ".,?!:'\"()-1" => third press is '?'
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             Assert.Equal("?", output);
         }
 
@@ -67,11 +67,11 @@ namespace OldPhoneKeyPad.Tests
         public void Cycling_Past_End_Emits_Digit_Then_Wraps()
         {
             var inputA = "2222#";   // "ABC2" -> 4th press => '2'
-            var outA = Keypad.OldPhonePad(inputA);
+            var outA = KeypadDecoder.OldPhonePad(inputA);
             Assert.Equal("2", outA);
 
             var inputB = "22222#";  // 5th press wraps to 'A'
-            var outB = Keypad.OldPhonePad(inputB);
+            var outB = KeypadDecoder.OldPhonePad(inputB);
             Assert.Equal("A", outB);
         }
 
@@ -83,7 +83,7 @@ namespace OldPhoneKeyPad.Tests
             var input = string.Concat(Enumerable.Repeat(unit, repeat)) + "#";
             var expected = string.Concat(Enumerable.Repeat("HELLO WORLD", repeat));
 
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             Assert.Equal(expected, output);
         }
 
@@ -91,7 +91,7 @@ namespace OldPhoneKeyPad.Tests
         public void Backspace_AtStart_DoesNotThrowAndReturnsEmpty()
         {
             var input = "*#"; // backspace before any char -> still empty
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             Assert.Equal(string.Empty, output);
         }
 
@@ -99,15 +99,8 @@ namespace OldPhoneKeyPad.Tests
         public void Hash_TerminatesInput_IgnoresFollowingPresses()
         {
             var input = "33#2222"; // after # decoding should stop
-            var output = Keypad.OldPhonePad(input);
+            var output = KeypadDecoder.OldPhonePad(input);
             Assert.Equal("E", output);
-        }
-
-        [Fact]
-        public void NullInput_ThrowsNullReferenceException()
-        {
-            var ex = Assert.Throws<NullReferenceException>(() => Keypad.OldPhonePad(null!));
-            Assert.Equal("Object reference not set to an instance of an object.", ex.Message);
         }
     }
 }

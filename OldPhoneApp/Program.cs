@@ -30,7 +30,7 @@ namespace OldPhoneKeyPad
                     return 1;
                 }
                 // Decode and print
-                string output = Keypad.OldPhonePad(args[0]);
+                string output = KeypadDecoder.OldPhonePad(args[0]);
                 Console.WriteLine(output);
                 return 0;
             }
