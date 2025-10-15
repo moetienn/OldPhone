@@ -19,16 +19,33 @@ namespace OldPhoneKeyPad
         /// <param name="args">
         /// Command-line arguments. The first argument should be the keypad input sequence to decode.
         /// </param>
-		static void Main(string[] args)
-		{
-            // validdate command-line arguments
-            if (args.Length != 1)
+		static int Main(string[] args)
+        {
+            try
             {
-                Console.WriteLine("Usage: dotnet run --project OldPhoneApp \"<input>\"");
-                return;
+                // Validate CLI args
+                if (args.Length != 1)
+                {
+                    Console.WriteLine("Usage: dotnet run --project OldPhoneApp \"<input>\"");
+                    return 1;
+                }
+                // Decode and print
+                string output = Keypad.OldPhonePad(args[0]);
+                Console.WriteLine(output);
+                return 0;
             }
-            // Decode and display the result
-			Console.WriteLine(Keypad.OldPhonePad(args[0]));
-		}
-	}
+            catch (IOException)
+            {
+                // Broken pipe / stdout closed (e.g., piping to 'head' truncated the stream).
+                // Exit gracefully without noisy stack traces.
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                // Last-resort guardrail for unexpected failures
+                Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+                return 1;
+            }
+        }
+    }
 }
