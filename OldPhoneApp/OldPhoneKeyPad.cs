@@ -1,6 +1,7 @@
 using System;
 using System.Data.Common;
 using System.Dynamic;
+using System.Runtime.Serialization;
 
 namespace OldPhoneKeyPad
 {
@@ -32,6 +33,14 @@ namespace OldPhoneKeyPad
 				char c = input[i];
                 if (c == '#')
                     break;
+                if (c == '*')
+                {
+                    if (result.Length > 0)
+                         result = result.Substring(0, result.Length);
+                    count = 0;
+                    lastChar = '\0';
+                    continue;
+                }
                 if (c == ' ')
                 {
                     result += GetLetterFromDictionnary(lastChar, count);
@@ -45,6 +54,7 @@ namespace OldPhoneKeyPad
                 {
                     if (lastChar != '\0')
                         result += GetLetterFromDictionnary(lastChar, count);
+                    // Console.WriteLine(result);
                     lastChar = c;
                     count = 1;
                 }
