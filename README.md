@@ -95,15 +95,6 @@ Tests cover the main behaviours: decoding examples, separators, backspace rules,
 
 Pressing a key cycles through the characters for that key; pressing more times than the number of characters wraps around.
 
-## Contributing
-
-Small, focused PRs are welcome. Ideas:
-- Add lower-case output option.
-- Make the mapping configurable.
-- Add more CLI options (read from file, quiet mode, etc.)
-
-If you'd like, I can open a PR that adds this README to the repository.
-
 ## License
 
-No license file included in the repo. If you want an open-source license added (MIT, Apache 2.0, etc.), tell me which one and I can add it.
+No license file included in the repo.
