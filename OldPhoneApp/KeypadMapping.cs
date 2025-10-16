@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace OldPhoneKeyPad
+namespace OldPhoneApp
 {
     /// <summary>
     /// Defines the mapping between numeric keys and their corresponding
