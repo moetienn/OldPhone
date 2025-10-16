@@ -14,7 +14,7 @@ namespace OldPhoneKeyPad
     public static class KeypadMapping
     {
         /// <summary>
-        /// Provides the numeric-to-character mapping data used by <see cref="Keypad"/>.
+        /// Provides the numeric-to-character mapping data used by <see cref="KeypadDecoder"/>.
         /// </summary>
         public static readonly ImmutableDictionary<char, string> LettersByKey =
             ImmutableDictionary.CreateRange(new[]

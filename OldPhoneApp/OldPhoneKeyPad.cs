@@ -29,6 +29,9 @@ namespace OldPhoneKeyPad
         /// </remarks>
 		public static String OldPhonePad(string input)
 		{
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
 			var  result = new StringBuilder();
 			char lastKey = '\0';
 			int pressCount = 0;
