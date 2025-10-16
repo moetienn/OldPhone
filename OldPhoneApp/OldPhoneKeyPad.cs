@@ -2,39 +2,10 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-
-
+using System.Threading.Tasks.Dataflow;
 
 namespace OldPhoneKeyPad
 {
-    /// <summary>
-    /// Defines the mapping between numeric keys and their corresponding
-    /// characters on a traditional mobile phone keypad.
-    /// </summary>
-    /// <remarks>
-    /// Each numeric key (2–9) maps to a sequence of uppercase letters followed by the digit itself.
-    /// The '1' key maps to punctuation marks, and the '0' key maps to a space character.
-    /// </remarks>
-    public class KeypadMapping
-    {
-        /// <summary>
-        /// Provides the numeric-to-character mapping data used by <see cref="Keypad"/>.
-        /// </summary>
-        public static readonly ImmutableDictionary<char, string> LettersByKey =
-            ImmutableDictionary.CreateRange(new[]
-            {
-                new KeyValuePair<char,string>('1', ".,?!:'\"()-1"),
-                new KeyValuePair<char,string>('2', "ABC2"),
-                new KeyValuePair<char,string>('3', "DEF3"),
-                new KeyValuePair<char,string>('4', "GHI4"),
-                new KeyValuePair<char,string>('5', "JKL5"),
-                new KeyValuePair<char,string>('6', "MNO6"),
-                new KeyValuePair<char,string>('7', "PQRS7"),
-                new KeyValuePair<char,string>('8', "TUV8"),
-                new KeyValuePair<char,string>('9', "WXYZ9"),
-                new KeyValuePair<char,string>('0', " ")
-            });
-	}
     /// <summary>
     /// Decodes a sequence produced by a traditional multi-tap mobile keypad.
     /// </summary>
@@ -63,55 +34,92 @@ namespace OldPhoneKeyPad
 			var  result = new StringBuilder();
 			char lastKey = '\0';
 			int pressCount = 0;
-			for (int i = 0; i < input.Length; i++)
-       		{
-				char c = input[i];
-                // Ignore anything that is not handled (not space, *, #, and not a known key)
-                if (!KeypadMapping.LettersByKey.ContainsKey(c) && c != '*' && c != '#' && c != ' ')
-                    continue;
-                // End: stop processing after flushing pending sequence
-                if (c == '#')
-                    break;
-                // Backspace: cancel pending sequence if any; otherwise remove last emitted char
-                if (c == '*')
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+
+                switch (c)
                 {
-                    if (pressCount > 0)
-                    {
-                        lastKey = '\0';
-                        pressCount = 0;
-                    }
-                    else if ( result.Length > 0)
-                         result.Remove( result.Length - 1, 1);
-                    continue;
+                    case '#':
+                        // flush once and return immediately
+                        FlushPending(result, ref lastKey, ref pressCount);
+                        return result.ToString();
+                    case '*':
+                        HandleBackspace(result, ref lastKey, ref pressCount);
+                        break;
+                    case ' ':
+                        HandleSpace(result, ref lastKey, ref pressCount);
+                        break;
+                    default:
+                        if (KeypadMapping.LettersByKey.ContainsKey(c))
+                            HandleMappedKey(result, ref lastKey, ref pressCount, c);
+                        break;
                 }
-                // ' ' space acts as a separator: confirms the current letter without adding a visible space.
-                if (c == ' ')
-                {
-                    if (pressCount > 0)
-                    {
-                        result.Append(GetMappedChar(lastKey, pressCount));
-                        lastKey = '\0';
-                        pressCount = 0;    
-                    }
-                    continue;
-                }
-                // Handles multi-tap behavior: consecutive presses of the same key cycle through its letters.
-                // When a different key is pressed, the previous letter is confirmed and a new sequence begins.
-                if (c == lastKey)
-                    pressCount++;
-                else
-                {
-                    if (lastKey != '\0')
-                         result.Append(GetMappedChar(lastKey, pressCount));
-                    lastKey = c;
-                    pressCount = 1;
-                }
-        	}
-            // Final flush to ensure the last sequence of key presses is processed before returning the final decoded text.
+            }
+            // Final flush in case the input ended without '#'
+            FlushPending(result, ref lastKey, ref pressCount);
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// Handler for the backspace '*' control.
+        /// Cancels a pending sequence if present; otherwise removes the last emitted character.
+        /// </summary>
+        private static void HandleBackspace(StringBuilder result, ref char lastKey, ref int pressCount)
+        {
             if (pressCount > 0)
-                 result.Append(GetMappedChar(lastKey, pressCount));
-			return  result.ToString();
-		}
+            {
+                lastKey = '\0';
+                pressCount = 0;
+            }
+            else if (result.Length > 0)
+            {
+                result.Remove(result.Length - 1, 1);
+            }
+        }
+
+        /// <summary>
+        /// Handler for the separator space ' '.
+        /// Confirms the pending sequence without inserting a visible space.
+        /// </summary>
+        private static void HandleSpace(StringBuilder result, ref char lastKey, ref int pressCount)
+        {
+            FlushPending(result, ref lastKey, ref pressCount);
+        }
+
+        /// <summary>
+        /// Handler for mapped numeric keys (2-9, 0, 1).
+        /// Implements multi-tap behavior: consecutive presses of the same key increment the counter;
+        /// pressing a different key flushes the previous pending character and starts a new sequence.
+        /// </summary>
+        private static void HandleMappedKey(StringBuilder result, ref char lastKey, ref int pressCount, char c)
+        {
+            if (lastKey != '\0' && lastKey == c)
+            {
+                pressCount++;
+            }
+            else
+            {
+                FlushPending(result, ref lastKey, ref pressCount);
+                lastKey = c;
+                pressCount = 1;
+            }
+        }
+
+        /// <summary>
+        /// Flushes the pending key sequence into the result, resetting pending state.
+        /// </summary>
+        private static void FlushPending(StringBuilder result, ref char lastKey, ref int pressCount)
+        {
+            if (lastKey != '\0' && pressCount > 0)
+            {
+                result.Append(GetMappedChar(lastKey, pressCount));
+                lastKey = '\0';
+                pressCount = 0;
+            }
+        }
+
         /// <summary>
         /// Returns the decoded character for a given key and press count.
         /// </summary>
