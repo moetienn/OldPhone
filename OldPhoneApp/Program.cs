@@ -1,4 +1,4 @@
-namespace OldPhoneKeyPad
+namespace OldPhoneApp
 {
     /// <summary>
     /// Entry point of the OldPhoneKeyPad application.
