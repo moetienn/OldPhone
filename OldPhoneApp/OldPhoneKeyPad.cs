@@ -1,7 +1,5 @@
 using System;
 using System.Text;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading.Tasks.Dataflow;
 
 namespace OldPhoneKeyPad
@@ -31,6 +29,9 @@ namespace OldPhoneKeyPad
         /// </remarks>
 		public static String OldPhonePad(string input)
 		{
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
 			var  result = new StringBuilder();
 			char lastKey = '\0';
 			int pressCount = 0;
