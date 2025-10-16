@@ -91,14 +91,16 @@ namespace OldPhoneKeyPad
 
         /// <summary>
         /// Handler for mapped numeric keys (2-9, 0, 1).
-        /// Implements multi-tap behavior: consecutive presses of the same key increment the counter;
+        /// Implements multi-tap behavior: consecutive presses of the same key advance a 1-based press counter and wrap it to the key mapping length;
         /// pressing a different key flushes the previous pending character and starts a new sequence.
         /// </summary>
         private static void HandleMappedKey(StringBuilder result, ref char lastKey, ref int pressCount, char c)
         {
             if (lastKey != '\0' && lastKey == c)
             {
-                pressCount++;
+                // prevent overflow of pressCount
+                if (KeypadMapping.LettersByKey.TryGetValue(c, out var letters) && letters.Length > 0)
+                    pressCount = (pressCount % letters.Length) + 1;
             }
             else
             {

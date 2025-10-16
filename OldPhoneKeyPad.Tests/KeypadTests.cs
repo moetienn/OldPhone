@@ -1,6 +1,6 @@
+using Xunit;
 using System;
 using System.Linq;
-using Xunit;
 
 namespace OldPhoneKeyPad.Tests
 {
@@ -276,7 +276,7 @@ namespace OldPhoneKeyPad.Tests
 		public void Very_Long_Chain_Repeats_HelloWorld_million_Times()
 		{
 			var unit = "4433555 555666096667775553";
-			var repeat = 1_000_000;
+			var repeat = 1000000;
 			var input = string.Concat(Enumerable.Repeat(unit, repeat)) + "#";
 			var expected = string.Concat(Enumerable.Repeat("HELLO WORLD", repeat));
 			var output = KeypadDecoder.OldPhonePad(input);
@@ -287,6 +287,17 @@ namespace OldPhoneKeyPad.Tests
 		public void Key2_100_Presses_Yields_Expected()
 		{
 			var n = 100;
+			var input = new string('2', n) + "#";
+			var mapping = KeypadMapping.LettersByKey['2']; // "ABC2"
+			var expected = mapping[(n - 1) % mapping.Length].ToString();
+			var actual = KeypadDecoder.OldPhonePad(input);
+			Assert.Equal(expected, actual); // here expected == "2"
+		}
+
+		[Fact]
+		public void Key2_10000_Presses_Yields_Expected()
+		{
+			var n = 10000;
 			var input = new string('2', n) + "#";
 			var mapping = KeypadMapping.LettersByKey['2']; // "ABC2"
 			var expected = mapping[(n - 1) % mapping.Length].ToString();
